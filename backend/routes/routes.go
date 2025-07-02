@@ -5,7 +5,12 @@ import (
 	"github.com/kibreab/backend/internal/handlers"
 )
 
-func Setup(r *gin.Engine, authHandler *handlers.AuthHandler, deckHandler *handlers.DeckHandler, flashHandler *handlers.FlashcardHandler) {
+func Setup(r *gin.Engine, 
+	authHandler *handlers.AuthHandler, 
+	deckHandler *handlers.DeckHandler, 
+	flashHandler *handlers.FlashcardHandler,
+	testHandler *handlers.TestHandler,
+	) {
 	api := r.Group("/api")
 
 	// Auth routes
@@ -33,4 +38,6 @@ func Setup(r *gin.Engine, authHandler *handlers.AuthHandler, deckHandler *handle
 		cards.GET("/:id", flashHandler.Get)
 		cards.DELETE("/:id", flashHandler.Delete)
 	}
+
+	api.GET("/test-openai", testHandler.CheckOpenAIKey)
 }

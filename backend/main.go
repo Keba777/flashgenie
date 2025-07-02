@@ -45,20 +45,21 @@ func main() {
 		log.Fatalf("❌ AutoMigrate failed: %v", err)
 	}
 
-	// Initialize services with JWT secret from config
+	// Initialize services with JWT secret and Together AI API key
 	authService := services.NewAuthService(repo, cfg.JWTSecret)
-	aiService := services.NewAIService(cfg.OpenAIKey)
+	aiService := services.NewAIService(cfg.TogetherAIKey)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
 	flashHandler := handlers.NewFlashcardHandler(aiService, repo)
 	deckHandler := handlers.NewDeckHandler(repo)
+	testHandler := handlers.NewTestHandler(aiService)
 
 	// Setup Gin router
 	r := gin.Default()
 
 	// Register routes
-	routes.Setup(r, authHandler, deckHandler, flashHandler)
+	routes.Setup(r, authHandler, deckHandler, flashHandler, testHandler)
 
 	// Start server
 	log.Printf("🚀 Server running on port %d...\n", cfg.ServerPort)

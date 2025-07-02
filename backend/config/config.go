@@ -7,14 +7,14 @@ import (
 )
 
 type Config struct {
-	DBHost     string
-	DBUser     string
-	DBPassword string
-	DBName     string
-	DBPort     int
-	ServerPort int
-	OpenAIKey  string
-	JWTSecret  string
+	DBHost        string
+	DBUser        string
+	DBPassword    string
+	DBName        string
+	DBPort        int
+	ServerPort    int
+	TogetherAIKey string
+	JWTSecret     string
 }
 
 func Load() *Config {
@@ -39,14 +39,19 @@ func Load() *Config {
 		log.Fatal("JWT_SECRET environment variable must be set")
 	}
 
+	apiKey := os.Getenv("TOGETHER_API_KEY")
+	if apiKey == "" {
+		log.Fatal("TOGETHER_API_KEY environment variable must be set")
+	}
+
 	return &Config{
-		DBHost:     os.Getenv("DB_HOST"),
-		DBUser:     os.Getenv("DB_USER"),
-		DBPassword: os.Getenv("DB_PASSWORD"),
-		DBName:     os.Getenv("DB_NAME"),
-		DBPort:     port,
-		ServerPort: serverPort,
-		OpenAIKey:  os.Getenv("OPENAI_API_KEY"),
-		JWTSecret:  jwtSecret,
+		DBHost:        os.Getenv("DB_HOST"),
+		DBUser:        os.Getenv("DB_USER"),
+		DBPassword:    os.Getenv("DB_PASSWORD"),
+		DBName:        os.Getenv("DB_NAME"),
+		DBPort:        port,
+		ServerPort:    serverPort,
+		TogetherAIKey: apiKey,
+		JWTSecret:     jwtSecret,
 	}
 }

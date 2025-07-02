@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -20,36 +21,39 @@ func NewFlashcardHandler(aiSvc *services.AIService, repo repository.Repository) 
 
 // Generate flashcards using AI and store them
 func (h *FlashcardHandler) Generate(c *gin.Context) {
-	deckID, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid deck ID"})
-		return
-	}
-	var req struct {
-		Content string `json:"content" binding:"required"`
-	}
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+    deckID, err := uuid.Parse(c.Param("id"))
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid deck ID"})
+        return
+    }
 
-	cards, err := h.aiSvc.GenerateFlashcards(req.Content)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+    var req struct{ Content string }
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
-	// Save each card
-	for i := range cards {
-		cards[i].DeckID = deckID
-		if err := h.repo.CreateFlashcard(&cards[i]); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save flashcard"})
-			return
-		}
-	}
+    log.Printf("Generating flashcards for deck %s with input text length %d", deckID.String(), len(req.Content))
 
-	c.JSON(http.StatusCreated, cards)
+    cards, err := h.aiSvc.GenerateFlashcards(req.Content)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate flashcards: " + err.Error()})
+        return
+    }
+
+    // Save generated cards
+    for i := range cards {
+        cards[i].DeckID = deckID
+        if err := h.repo.CreateFlashcard(&cards[i]); err != nil {
+            log.Printf("Failed to save flashcard: %v", err)
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save flashcard: " + err.Error()})
+            return
+        }
+    }
+
+    c.JSON(http.StatusOK, cards)
 }
+
 
 // List flashcards in a deck
 func (h *FlashcardHandler) List(c *gin.Context) {
