@@ -45,6 +45,8 @@ func main() {
 		log.Fatalf("❌ AutoMigrate failed: %v", err)
 	}
 
+	jwtSecret := cfg.JWTSecret
+
 	// Initialize services with JWT secret and Together AI API key
 	authService := services.NewAuthService(repo, cfg.JWTSecret)
 	aiService := services.NewAIService(cfg.TogetherAIKey)
@@ -59,7 +61,7 @@ func main() {
 	r := gin.Default()
 
 	// Register routes
-	routes.Setup(r, authHandler, deckHandler, flashHandler, testHandler)
+	routes.Setup(r, authHandler, deckHandler, flashHandler, testHandler, jwtSecret)
 
 	// Start server
 	log.Printf("🚀 Server running on port %d...\n", cfg.ServerPort)

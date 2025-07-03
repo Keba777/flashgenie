@@ -1,19 +1,26 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { colors } from "../themes/colors";
+import { RootStackParamList } from "../navigation/AppNavigator";
 
-export default function HomeScreen({ navigation }: any) {
+type Props = NativeStackScreenProps<RootStackParamList, "Home">;
+
+export default function HomeScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to FlashGenie</Text>
-      <Text style={styles.subtitle}>
-        AI-powered flashcard generator for smarter learning.
-      </Text>
-
+      <Text style={styles.title}>Welcome, Student!</Text>
       <Pressable
-        onPress={() => navigation.navigate("Flashcards")}
-        style={styles.button}
+        style={[styles.button, { backgroundColor: colors.primary }]}
+        onPress={() => navigation.navigate("DeckList")}
       >
-        <Text style={styles.buttonText}>View Flashcards</Text>
+        <Text style={styles.btnText}>My Decks</Text>
+      </Pressable>
+      <Pressable
+        style={[styles.button, { backgroundColor: colors.secondary }]}
+        onPress={() => navigation.navigate("CreateDeck")}
+      >
+        <Text style={styles.btnText}>New Deck</Text>
       </Pressable>
     </View>
   );
@@ -21,33 +28,26 @@ export default function HomeScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#F3F4F6", // background
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 24, // px-6
+    flex:1,
+    backgroundColor: colors.background,
+    justifyContent:"center",
+    alignItems:"center",
+    padding:24,
   },
   title: {
-    color: "#111827", // text-primary
-    fontSize: 32, // text-4xl
-    fontWeight: "bold",
-    marginBottom: 24, // mb-6
-  },
-  subtitle: {
-    color: "#6B7280", // text-secondary
-    textAlign: "center",
-    marginBottom: 48, // mb-12
-    fontSize: 16,
+    fontSize:28,
+    color: colors.textPrimary,
+    marginBottom:24,
   },
   button: {
-    backgroundColor: "#4F46E5", // primary
-    paddingHorizontal: 24, // px-6
-    paddingVertical: 12, // py-3
-    borderRadius: 8, // rounded-md
+    paddingVertical:12,
+    paddingHorizontal:32,
+    borderRadius:8,
+    marginVertical:8,
   },
-  buttonText: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "600", // font-semibold
+  btnText: {
+    color: colors.surface,
+    fontSize:16,
+    fontWeight:"600",
   },
 });
