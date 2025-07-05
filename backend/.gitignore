@@ -16,9 +16,6 @@ coverage.out
 # Go workspace file
 go.work
 
-# Go modules
-**/go.sum
-
 # Editor temporary files
 *~
 *.swp
