@@ -17,7 +17,6 @@ import (
 )
 
 func main() {
-	// Load environment variables from .env if present
 	if err := godotenv.Load(); err != nil {
 		log.Println("⚠️  No .env file found, using system environment variables")
 	}
@@ -37,17 +36,12 @@ func main() {
 		log.Fatalf("❌ Failed to connect to database: %v", err)
 	}
 
-	// Initialize repository
 	repo := repository.NewPostgresRepo(db)
-
-	// Run migrations
 	if err := repo.AutoMigrate(); err != nil {
 		log.Fatalf("❌ AutoMigrate failed: %v", err)
 	}
 
-	jwtSecret := cfg.JWTSecret
-
-	// Initialize services with JWT secret and Together AI API key
+	// Initialize services
 	authService := services.NewAuthService(repo, cfg.JWTSecret)
 	aiService := services.NewAIService(cfg.TogetherAIKey)
 
@@ -57,13 +51,11 @@ func main() {
 	deckHandler := handlers.NewDeckHandler(repo)
 	testHandler := handlers.NewTestHandler(aiService)
 
-	// Setup Gin router
+	// Setup Gin router and routes
 	r := gin.Default()
+	routes.Setup(r, authHandler, deckHandler, flashHandler, testHandler, cfg.JWTSecret)
 
-	// Register routes
-	routes.Setup(r, authHandler, deckHandler, flashHandler, testHandler, jwtSecret)
-
-	// Start server
+	// Start server on the port Render provides (or fallback)
 	log.Printf("🚀 Server running on port %d...\n", cfg.ServerPort)
 	if err := r.Run(fmt.Sprintf(":%d", cfg.ServerPort)); err != nil {
 		log.Fatalf("❌ Failed to run server: %v", err)

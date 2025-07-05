@@ -18,20 +18,20 @@ type Config struct {
 }
 
 func Load() *Config {
-	portStr := os.Getenv("DB_PORT")
-	port, err := strconv.Atoi(portStr)
+	dbPortStr := os.Getenv("DB_PORT")
+	dbPort, err := strconv.Atoi(dbPortStr)
 	if err != nil {
-		log.Fatalf("Invalid DB_PORT: %s", portStr)
+		log.Fatalf("Invalid DB_PORT: %s", dbPortStr)
 	}
 
-	serverPortStr := os.Getenv("SERVER_PORT")
-	serverPort := 8080 // default
-	if serverPortStr != "" {
-		sp, err := strconv.Atoi(serverPortStr)
+	portStr := os.Getenv("PORT")
+	serverPort := 8080
+	if portStr != "" {
+		p, err := strconv.Atoi(portStr)
 		if err != nil {
-			log.Fatalf("Invalid SERVER_PORT: %s", serverPortStr)
+			log.Fatalf("Invalid PORT: %s", portStr)
 		}
-		serverPort = sp
+		serverPort = p
 	}
 
 	jwtSecret := os.Getenv("JWT_SECRET")
@@ -49,7 +49,7 @@ func Load() *Config {
 		DBUser:        os.Getenv("DB_USER"),
 		DBPassword:    os.Getenv("DB_PASSWORD"),
 		DBName:        os.Getenv("DB_NAME"),
-		DBPort:        port,
+		DBPort:        dbPort,
 		ServerPort:    serverPort,
 		TogetherAIKey: apiKey,
 		JWTSecret:     jwtSecret,
